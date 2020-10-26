@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { showCategory, reset } from '../../store/categories';
+import { showCategory} from '../../store/categories';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -66,7 +66,7 @@ const mapStateToProps = state => ({
   Category: state.Category,
 });
 
-const mapDispatchToProps = {showCategory, reset};
+const mapDispatchToProps = {showCategory};
 
 // const mapDispatchToProps = ({
 //     showCategory: dispatch(showCategory()),
