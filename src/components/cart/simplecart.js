@@ -1,6 +1,6 @@
-import React from 'react';
+import React ,{useEffect} from 'react';
 import { connect } from 'react-redux';
-import { addToCart, removeFromCart} from '../../store/cart';
+import {getCartData,deleteFromCart} from '../../store/cart';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -10,11 +10,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
+//import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -33,8 +30,16 @@ const useStyles = makeStyles((theme) => ({
 
 const CartCounter = props => {
   const classes = useStyles();
-  const [dense, setDense] = React.useState(false);
-  const [secondary, setSecondary] = React.useState(false);
+  const [dense] = React.useState(false);
+  const [secondary] = React.useState(false);
+
+  const fetchData = (e) => {
+    e && e.preventDefault(); // if I have a form
+    props.getCartData();
+  };
+  useEffect(()=> {
+    fetchData();
+  }, []);
   return (
     <section className="counter">
       <Grid item xs={12} md={6} id="cartList">
@@ -47,16 +52,19 @@ const CartCounter = props => {
               <ListItem key={id}>
                 <ListItemAvatar>
                   <Avatar>
+                  {console.log('{console.log(item.name)}{console.log(item.name)}',item.name)}
                     <FolderIcon />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={item.name.toUpperCase()}
+                  primary={item.name}
+
                   secondary={secondary ? 'Secondary text' : null}
                 />
                 <ListItemSecondaryAction key={id}>
-                  <IconButton edge="end" aria-label="delete" onClick={()=> props.removeFromCart(item.name)}>
+                  <IconButton edge="end" aria-label="delete" onClick={()=> props.deleteFromCart(item._id,props.products,item)}>
                     <DeleteIcon />
+
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>,
@@ -70,10 +78,11 @@ const CartCounter = props => {
 };
 
 const mapStateToProps = state => ({
+  products: state.Products.products,
   Cart: state.Cart,
 });
 
-const mapDispatchToProps = {addToCart, removeFromCart};
+const mapDispatchToProps = {getCartData,deleteFromCart};
 
 // const mapDispatchToProps = ({
 //     showCategory: dispatch(showCategory()),

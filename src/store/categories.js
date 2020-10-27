@@ -12,7 +12,8 @@ let initialState = {
     let {type, payload} = action; // destructuring
     // let type = action.type
     // let payload = action.payload
-      
+    let activeCategory; 
+    let  categories;
     switch(type) {
     case 'activate':
       // let products = state.products.map(product=> {
@@ -21,8 +22,8 @@ let initialState = {
       //   }
       //   return product;
       // });
-      let activeCategory = payload;
-      let  categories = state.categories;  
+      activeCategory = payload;
+      categories = state.categories;  
       return {categories, activeCategory};
   
     default:
