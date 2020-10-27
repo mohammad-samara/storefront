@@ -1,3 +1,4 @@
+import superagent from 'superagent';
 let initialState = {
   products: [
     { name: 'TV', category: 'electronics', price: 699.00, inStock: 5 ,description:'best fabric', url: 'https://cdn.mos.cms.futurecdn.net/78kzT5oZeDve55LifhMHZ3.jpg' },
@@ -13,6 +14,7 @@ let initialState = {
   ],
   };
   
+
   // reducer : switch case
   export default (state = initialState, action) => {
     let {type, payload,payload2} = action; // destructuring
@@ -21,14 +23,9 @@ let initialState = {
     // let payload = action.payload
     let products;   
     let productsTo;
+    let pepo;
     switch(type) {
     case 'activate':
-    // let products = state.products.map(product=> {
-    //   if (product.category === payload) {
-    //     return { name: product.name, category: product.category, price: product.price, inStock: product.inStock };
-    //   }
-    //   return product;
-    // });
     products = [...state.products];
     productsTo =[...state.products.filter(product =>{ return product.category === payload; })];
     console.log(productsTo,'productsproductsproductsproducts');
@@ -37,7 +34,8 @@ let initialState = {
     case 'count':
     products = state.products.map(product=> {
       if (product.name === payload) {
-        return { name: product.name,category: product.category,price: product.price, inStock: product.inStock-1,description:product.description, url: product.url};
+        return {_id:product._id, name: product.name,category: product.category,price: product.price, inStock: product.inStock-1,description:product.description, url: product.url};
+        // putRemoteDat(product);
       }
       return product;
     });
@@ -45,11 +43,44 @@ let initialState = {
     productsTo =[...products.filter(product =>{ return product.category === payload2; })];
     console.log(productsTo,'productsproductsproductsproducts');
     return {products,productsTo};
+    case 'GET':
+    console.log(payload,'payloadpayloadpayloadpayload');
+    payload.forEach((ele,i) => {
+      console.log(ele,'payloadpayloadpayloadpayload');
+      state.products.push(ele);
+    });
+    products = [...state.products];
+    productsTo =[...products.filter(product =>{ return product.category === payload2; })];
+    return {products,productsTo};  
+  // case 'InStock':
+  //   return {products,productsTo}; 
     default:
       return state;
     }
   };
-  
+  let api = 'https://lab-38.herokuapp.com/product'; 
+export const getRemoteData =() => dispatch => {
+  // call my data 
+  return superagent.get(api)
+    .then(data => {
+      dispatch(getAction(data.body));
+    });
+};
+
+export const putRemoteData = (data,product) => async dispatch => {
+  console.log(data,data);
+  // dispatch(decreseInStock(data))
+  product.inStock=product.inStock-1;
+  console.log('useData',product);
+  await superagent.patch(`${api}`).set('Content-Type', 'application/json').send(product)
+    .then((response)=>{
+      console.log('responseresponseresponse',response);
+    });
+  // dispatch action for the update
+  // console.log(response)
+};
+
+
   // Actions function
   export const showCategory = (name) => {
     return {
@@ -57,7 +88,8 @@ let initialState = {
       payload: name,
     };
   };
-  
+  // export const getProduct = 
+
   export const changeCount = (name,activeCategory) => {
     return {
       type: 'count',
@@ -65,5 +97,22 @@ let initialState = {
       payload2: activeCategory,
     };
   };
+
+
+
+
+  export const getAction = payload => {
+    return {
+      type: 'GET',
+      payload: payload,
+    };
+  };  
   
-    
+  // export const decreseInStock = payload => {
+  //   return {
+  //     type: 'InStock',
+  //     payload: payload,
+  //   };
+  // };  
+  
+  // {_id: '5f0f86a1aa9b4900170a6e1c', name: 'botato', category: 'food', price: 141, inStock: 152,url: 'https://thumbs.dreamstime.com/b/old-radio-20059485.jpg',description: 'King-Of-Noobs'} 

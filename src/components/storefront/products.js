@@ -1,7 +1,8 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+import React,{useEffect} from 'react';
 import { connect } from 'react-redux';
-import { showCategory, changeCount } from '../../store/products';
-import { addToCart} from '../../store/cart';
+import { showCategory, changeCount,getRemoteData,putRemoteData } from '../../store/products';
+import { getCartData,postRemoteData} from '../../store/cart';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -21,9 +22,19 @@ const VotesCounter = props => {
   // To use more than one function in one onClick
   function onClick(a,b,c){
     props.changeCount(a,b);
-    props.addToCart(c);
-
+    props.putRemoteData(a,c);
+    props.postRemoteData(c);
   }
+  const fetchData = (e) => {
+    e && e.preventDefault(); // if I have a form
+    props.getRemoteData();
+  };
+
+  useEffect(()=> {
+    fetchData();
+  }, []);
+
+
   const classes = useStyles();
   return (
     <section className="counter">
@@ -69,7 +80,7 @@ const mapStateToProps = state => ({
   Category: state.Category,
 });
 
-const mapDispatchToProps = {showCategory, changeCount,addToCart};
+const mapDispatchToProps = {showCategory, changeCount,getRemoteData,putRemoteData,getCartData,postRemoteData};
 
 // const mapDispatchToProps = ({
 //     showCategory: dispatch(showCategory()),
