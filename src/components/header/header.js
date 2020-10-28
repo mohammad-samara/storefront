@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import { addToCart} from '../../store/cart';
 import { connect } from 'react-redux';
+
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -73,7 +73,7 @@ function Header (props) {
               Support
             </Link>
             <Link variant="button" color="textPrimary" href="#" className={classes.link}>
-              Cart({props.Cart.cartProducts.length})
+              Cart({props.cart.length})
             </Link>
           </nav>
           <Button href="#" color="default" variant="outlined" className={classes.link}>
@@ -84,10 +84,10 @@ function Header (props) {
     </header>
   );
 }
-const mapStateToProps = state => ({
-  Cart: state.Cart,
-});
-
-const mapDispatchToProps = {addToCart};
+const mapStateToProps = store => {
+  return {
+      cart: store.Cart.items,
+  }
+}
   
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default connect(mapStateToProps)(Header);

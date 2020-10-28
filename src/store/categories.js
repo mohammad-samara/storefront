@@ -1,46 +1,68 @@
+import axios from 'axios';
+import { loading } from './loading';
+const url = `https://todo-samara.herokuapp.com/categories/`;
+
 let initialState = {
-    categories: [
-      { name: 'electronics', displayName: 'Elecronics',description:'use electricity' },
-      { name: 'food', displayName: 'Food',description:'you can eat' },
-      { name: 'clothing', displayName: 'Clothing',description:'you can wear' },
+    categories: [{
+            name: 'electronics',
+            displayName: 'Electronics',
+            description: 'electronics'
+        },
+        {
+            name: 'food',
+            displayName: 'Food',
+            description: 'food'
+        },
+        {
+            name: 'clothing',
+            displayName: 'Clothing',
+            description: 'clothing'
+        }
+
     ],
-    activeCategory: '',
-  };
+    activeCategory: 'clothing',
+};
+
+export default (state = {categories: []}, action) => {
+
+    let { type, payload } = action;
   
-  // reducer : switch case
-  export default (state = initialState, action) => {
-    let {type, payload} = action; // destructuring
-    // let type = action.type
-    // let payload = action.payload
-    let activeCategory; 
-    let  categories;
-    switch(type) {
-    case 'activate':
-      // let products = state.products.map(product=> {
-      //   if (product.category === payload) {
-      //     return { name: product.name, category: product.category, price: product.price, inStock: product.inStock };
-      //   }
-      //   return product;
-      // });
-      activeCategory = payload;
-      categories = state.categories;  
-      return {categories, activeCategory};
-  
-    default:
-      return state;
+    switch (type) {
+      case 'CHANGE_ACTIVE':
+        return {
+          ...state,
+          activeCategory: payload
+        }
+      case 'GET_CATEGORIES':
+        return {
+          categories: payload,
+          activeCategory: '' 
+        };
+      default:
+        return state;
     }
-  };
+  }
   
-  // Actions function
-  export const showCategory = (name) => {
-    return {
-      type: 'activate',
-      payload: name,
-    };
-  };
+  export const getCategories = () => {
   
-  // export const reset = () => {
-  //   return {
-  //     type: 'RESET',
-  //   };
-  // };
+  
+    return async dispatch => {
+  
+      dispatch(loading(true));
+      let response = await axios({ url, method: 'GET' });
+      dispatch(loading(false));
+  
+      dispatch({
+        type: 'GET_CATEGORIES',
+        payload: response.data.results
+          .filter(product => product.name !== 'admin')
+      })
+  
+    }
+  
+  }
+  
+  export const changeActiveCategory = name => ({
+    type: 'CHANGE_ACTIVE',
+    payload: name,
+  })
