@@ -2,7 +2,7 @@
 import React,{useEffect} from 'react';
 import { connect } from 'react-redux';
 // import {getCartData} from '../../store/cart';
-import { showCategory} from '../../store/categories';
+import { changeActiveCategory, getCategories } from '../../store/categories'
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -40,8 +40,13 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(3),
   },
 }));
-const VotesCounter = props => {
+const Categories = props => {
+  let { getCategories, categories, active, changeActiveCategory } = props;
   const classes = useStyles();
+
+  useEffect(() => {
+    getCategories();
+  }, [getCategories]);
 
   // const fetchCartData = (e) => {
   //   e && e.preventDefault(); // if I have a form
@@ -56,14 +61,14 @@ const VotesCounter = props => {
     <section className="counter">
       <p id='categoriesTitle'>Browse our Categories</p>
       <ul id='categories'>
-        {props.Category.categories.map( categories=> 
-          <li onClick={()=> props.showCategory(categories.name)} key={categories.name}> |{categories.name.toUpperCase()}|</li>,
+        {categories.map( category=> 
+          <li onClick={()=> props.changeActiveCategory(category.name)} key={category.name}> |{category.name.toUpperCase()}|</li>,
         )}
       </ul>
       {/*  what happens when maxWidth is set to xs, xl? */}
       <Container maxWidth="sm" component="main" className={classes.heroContent}>
         <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-          {props.Category.activeCategory.toUpperCase()}
+          {props.active}
         </Typography>
         <Typography variant="h5" align="center" color="textSecondary" component="p">
           Here's some really cool things you can do
@@ -74,16 +79,11 @@ const VotesCounter = props => {
 
 };
 
-const mapStateToProps = state => ({
-  Category: state.Category,
-});
+const mapStateToProps = store => ({
+  categories: store.Category.categories,
+  active: store.Category.activeCategory,
+})
 
-const mapDispatchToProps = {showCategory};
+const mapDispatchToProps = { changeActiveCategory, getCategories };
 
-// const mapDispatchToProps = ({
-//     showCategory: dispatch(showCategory()),
-//     reset: dispatch(reset())
-// })
-
-// instead of exporting the component we export it after it's been connected the redux store
-export default connect(mapStateToProps, mapDispatchToProps)(VotesCounter);
+export default connect(mapStateToProps, mapDispatchToProps)(Categories);

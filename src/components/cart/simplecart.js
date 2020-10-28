@@ -1,6 +1,7 @@
 import React ,{useEffect} from 'react';
 import { connect } from 'react-redux';
-import {getCartData,deleteFromCart} from '../../store/cart';
+import { removeFromCart } from '../../store/cart';
+import { increaseInventory } from '../../store/products';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -28,18 +29,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CartCounter = props => {
+const SimpleCart = props => {
   const classes = useStyles();
   const [dense] = React.useState(false);
   const [secondary] = React.useState(false);
 
-  const fetchData = (e) => {
-    e && e.preventDefault(); // if I have a form
-    props.getCartData();
-  };
-  useEffect(()=> {
-    fetchData();
-  }, []);
+  const cart = props.cart;
+
+  const removeHandler = item => {
+    props.removeFromCart(item.name);
+    props.increaseInventory(item);
+};
   return (
     <section className="counter">
       <Grid item xs={12} md={6} id="cartList">
@@ -48,11 +48,10 @@ const CartCounter = props => {
         </Typography> */}
         <div className={classes.demo}>
           <List dense={dense}>
-            {props.Cart.cartProducts.map((item,id)=> 
+            {cart.map((item,id)=> 
               <ListItem key={id}>
                 <ListItemAvatar>
                   <Avatar>
-                  {console.log('{console.log(item.name)}{console.log(item.name)}',item.name)}
                     <FolderIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -62,7 +61,7 @@ const CartCounter = props => {
                   secondary={secondary ? 'Secondary text' : null}
                 />
                 <ListItemSecondaryAction key={id}>
-                  <IconButton edge="end" aria-label="delete" onClick={()=> props.deleteFromCart(item._id,props.products,item)}>
+                  <IconButton edge="end" aria-label="delete" onClick={()=> removeHandler(item)}>
                     <DeleteIcon />
 
                   </IconButton>
@@ -77,17 +76,12 @@ const CartCounter = props => {
 
 };
 
-const mapStateToProps = state => ({
-  products: state.Products.products,
-  Cart: state.Cart,
-});
+const mapStateToProps = store => {
+  return {
+      cart: store.Cart.items,
+  }
+}
 
-const mapDispatchToProps = {getCartData,deleteFromCart};
+const mapDispatchToProps = { removeFromCart, increaseInventory };
 
-// const mapDispatchToProps = ({
-//     showCategory: dispatch(showCategory()),
-//     reset: dispatch(reset())
-// })
-
-// instead of exporting the component we export it after it's been connected the redux store
-export default connect(mapStateToProps, mapDispatchToProps)(CartCounter);
+export default connect(mapStateToProps, mapDispatchToProps)(SimpleCart);

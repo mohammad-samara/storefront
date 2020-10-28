@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React,{useEffect} from 'react';
 import { connect } from 'react-redux';
-import { showCategory, changeCount,getRemoteData,putRemoteData } from '../../store/products';
-import { getCartData,postRemoteData} from '../../store/cart';
+import { addToCart } from '../../store/cart';
+import { decreaseInventory, getProducts } from '../../store/products';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
+import { Box } from '@material-ui/core';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -18,28 +19,36 @@ const useStyles = makeStyles({
   },
 });
 
-const VotesCounter = props => {
-  // To use more than one function in one onClick
-  function onClick(a,b,c){
-    props.changeCount(a,b);
-    props.putRemoteData(a,c);
-    props.postRemoteData(c);
-  }
-  const fetchData = (e) => {
-    e && e.preventDefault(); // if I have a form
-    props.getRemoteData();
-  };
+const Products = props => {
+  const getProducts = props.getProducts;
+  
+    useEffect(() => {
+      getProducts();
+    }, [getProducts]);
+    
+  
+    const buttonHandler = product => {
+      props.addToCart(product);
+      props.decreaseInventory(product);
+    }
 
-  useEffect(()=> {
-    fetchData();
-  }, []);
+    const productList = props.products.filter(product => product.category === props.active);
 
 
   const classes = useStyles();
   return (
+    
     <section className="counter">
+      {/* <Box className={classes.jss5} textAlign="center">
+                <Typography variant="h2" color="textPrimary">
+                    {productList.length > 0 ? productList[0].category.toUpperCase() : ''}
+                </Typography>
+                <Typography variant="h6" color="textSecondary">
+                {productList.length > 0 ? 'Category Description Goes Here' : ''}
+                </Typography>
+            </Box> */}
       <ul id="productLi">
-        {props.productsTo.map( (product,id)=> 
+        {productList.map( (product,id)=> 
           <Card className={classes.root} key={id}>
             <CardActionArea>
               <CardMedia
@@ -59,7 +68,7 @@ const VotesCounter = props => {
               </CardContent>
             </CardActionArea>
             <CardActions>
-              <Button size="small" color="primary" onClick={()=> onClick(product.name,props.Category.activeCategory,product)}>
+              <Button size="small" color="primary" onClick={()=> buttonHandler(product)}>
           ADD TO CART
               </Button>
               <Button size="small" color="primary">
@@ -75,17 +84,11 @@ const VotesCounter = props => {
 
 };
 
-const mapStateToProps = state => ({
-  productsTo: state.Products.productsTo,
-  Category: state.Category,
+const mapStateToProps = store => ({
+  products: store.Products.products,
+  active: store.Category.activeCategory,
 });
 
-const mapDispatchToProps = {showCategory, changeCount,getRemoteData,putRemoteData,getCartData,postRemoteData};
+const mapDispatchToProps = { addToCart, decreaseInventory, getProducts };
 
-// const mapDispatchToProps = ({
-//     showCategory: dispatch(showCategory()),
-//     reset: dispatch(reset())
-// })
-
-// instead of exporting the component we export it after it's been connected the redux store
-export default connect(mapStateToProps, mapDispatchToProps)(VotesCounter);
+export default connect(mapStateToProps, mapDispatchToProps)(Products);
